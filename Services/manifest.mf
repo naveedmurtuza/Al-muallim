@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.almuallim.service
+OpenIDE-Module-Localizing-Bundle: org/almuallim/service/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

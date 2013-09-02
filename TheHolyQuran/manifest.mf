@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.almuallim.theholyquran
+OpenIDE-Module-Install: org/almuallim/theholyquran/Installer.class
+OpenIDE-Module-Localizing-Bundle: org/almuallim/theholyquran/Bundle.properties
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
+OpenIDE-Module-Specification-Version: 1.0
+

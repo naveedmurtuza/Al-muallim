@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: jidesoft
+OpenIDE-Module-Install: jidesoft/Installer.class
+OpenIDE-Module-Localizing-Bundle: jidesoft/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

@@ -1,0 +1,26 @@
+Data Attributes
+data-url
+    contains the url of the document.(ex: almuallim://TheHolyQuran?chapter=1&verse=1&className=org.almuallim.theholyquran.api.OpenChapter)
+     javascript code to retrieve the url
+        
+        $('#document').data('url');
+
+data-chapter-index (module specific - The Holy Quran)
+    contains the chapter index 
+
+    $('#document').data('chapter-index');
+
+data-url
+     contains the url for an article(verse) in the document
+     javascript code to retrieve the url for selected article(verse)
+        
+        $('article.selected').data('url');
+
+data-verse-index (module specific - The Holy Quran)
+    contains the verse index
+    
+data-ref
+    contains the ref text example(Chapter 6: Verse 1)
+data-translator-id
+    
+data-translated-lang
