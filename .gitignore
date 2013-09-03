@@ -44,7 +44,9 @@ local.properties
 # Build results
 
 [Dd]ebug/
-[Rr]elease/
+#for netbeans platform this folder is part of the app deployment
+#[Rr]elease/
+
 x64/
 build/
 [Bb]in/

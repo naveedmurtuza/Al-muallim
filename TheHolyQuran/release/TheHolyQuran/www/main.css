@@ -1,0 +1,148 @@
+
+#article-menu li
+{
+    display: inline;
+}
+
+#article-menu a .ui-button-text
+{
+    padding: 3px;
+}
+
+
+#document .verse {
+    padding: 5px 25px 5px 10px;
+    position: relative;
+}
+#document .verse:hover
+{
+    padding-right: 20px;
+    border-right: #91d100 solid 5px;
+    background-color: #d4d4d4;
+}
+
+
+#document .verse.selected
+{
+    padding: 1px 21px 1px 6px;
+    /*border-right: #91d100 solid 5px;*/
+    background-color: #d4d4d4;
+    border: 4px #2d89ef solid;
+}
+#document .verse.selected:before {
+    position: absolute;
+    content: "\e08a";
+    color: #fff;
+    right: 4px;
+    font-family: iconFont;
+    z-index: 1002;
+}
+#document .verse.selected {
+    border: 4px #91d100 solid;
+}
+#document .verse.selected:after {
+    color: #91d100;
+    width: 0;
+    height: 0;
+    border-top: 40px solid #91d100;
+    border-left: 40px solid transparent;
+    position: absolute;
+    display: block;
+    right: 0;
+    content: ".";
+    top: 0;
+    z-index: 1001;
+}
+
+section#sura-name{
+    padding: 0px;
+    margin: 0px;
+    font-family: 'me_quran';
+    font-size: 3em; 
+    color: black;
+    text-align: center;
+}
+section#sura-name p
+{
+    margin-top: 16px;
+    border-bottom: #91d100;
+    border-bottom-width: 8px;
+    border-bottom-style: solid;
+    display:inline-block;
+}
+
+section#bismillah p img
+{
+    display: block; margin: 0 auto;margin-top: -50px;
+}
+
+article.verse p.verbatim
+{
+    text-align: right;overflow: visible;
+}
+.ui-icon-keyboard { background-image: url(../images/keyboard.png) !important;
+                    width: 32px !important; 
+                    height: 32px !important;
+                    margin-left: -15px !important;  
+                    margin-top: -15px !important;  }
+.icon-alone {
+    display: inline-block; /* Fix for clickability issue in WebKit */
+}
+.screen-reader-text { /* Reusable, toolbox kind of class */
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+}
+#link-toolbar.ui-button-text-only .ui-button-text {
+    padding: 0.2em 0.3em;
+}
+.toolbar-container
+{
+    position: absolute; top: 16px; right: 15px;
+}
+
+.key-shortcuts-container
+{
+    position: absolute; bottom:  5px; left: 15px;
+}
+.verse-number {
+    position: relative;
+}
+.verse-number:before
+{
+    position:absolute;
+    font-family: 'islamic-vectors';
+    top:0;
+    right:-5px;
+    content: ")"; 
+}
+.verse-number:after
+{
+    position:absolute;
+    font-family: 'islamic-vectors';
+    top:0;
+    left:-5px;
+    content: "(";
+}
+
+
+[data-icon]:before {
+    font-family: iconFont; /* BYO icon font, mapped smartly */
+    content: attr(data-icon);
+    speak: none; /* Not to be trusted, but hey. */
+}
+
+section#document p span
+{
+    font-size: 12px; 
+    margin: 0 5px; 
+    padding: 0 5px; 
+    border: solid #91d100 thin; 
+    color: white; 
+    background-color: #91d100;
+}
+
+
+
+
+

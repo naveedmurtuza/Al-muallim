@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <meta name="viewport" content="width=device-width">
+        $images
+        $javascriptFramework
+        $moduleStyles
+    </head>
+    <body style="zoom: 1;">
+        <div id="background-animation">
+	
+	<div id="headerimgs">
+		<div id="headerimg1" class="headerimg"></div>
+		<div id="headerimg2" class="headerimg"></div>
+	</div>
+	
+	<div id="headernav-outer">
+		<div id="headernav">
+			<div id="back" class="btn"></div>
+			<div id="control" class="btn pause"></div>
+			<div id="next" class="btn"></div>
+		</div>
+	</div>
+	
+	<div id="headertxt">
+		<span id="firstline"></span>
+	</div>
+</div> 
+<section id="search" class="main hidden">
+	<div><input id="searchTxt" type="text"><span class="tips"></span><input type="button" id="searchBtn" value="Search"></div>
+</section>
+<section id="searchResults"></section>
+<div id="searchTips">
+	<p><span>Quotes</span>eg. "pledge allegiance" <br />
+Searches for the whole phrase instead of individual words </p>
+<p><span>Wildcards</span>e.g. test* te*t t?st<br />
+Matches any set of one or more characters. For example test* would result in test, tester, testers, etc. whereas ? is used for single character replacement</p>
+<p><span>Fuzzy Search</span> e.g. swore~ <br />
+Finds terms that are similar in spelling. For example swore~ would result in swore, snore, score, etc. </p>
+<p><span>Term Boosting </span> e.g. pledge^4 hijrah <br />
+Boosts words with higher relevance. Here, the word pledge will have higher weight than hijrah</p>
+<p><span>Proximity Searches</span> "pledge migration"~10 <br />
+This will yield results in which the words pledge and migration are separated by no more then 10 words. Very helpful if you only know the context of what you are searching for.</p>
+<p><span>Boolean Operators </span> e.g. ("pledge allegiance" OR "shelter) AND prayer <br />
+Create complex phrase and word queries by using Boolean logic. </p>
+</div>
+    </body>
+</html>

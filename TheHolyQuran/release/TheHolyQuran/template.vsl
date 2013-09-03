@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <meta name="viewport" content="width=device-width">
+        $javascriptFramework
+        $customStyleScripts
+    </head>
+    <body style="zoom: 1;">
+        <div id="main" style="width:90%; margin: 0 auto;">
+            <section id="sura-name" style="">
+                <p style="">$chapter.verbatimName</p>
+            </section>
+            <section id="bismillah" #if ($chapter.index == 1) style="display: none" #end>
+                <p> <img src="$bismillahImagePath" width="200" height="60" style="display: block; margin: 0 auto;margin-top: -50px;"> </p>
+            </section>
+            <section id="document" data-url="$url">
+            #foreach($verse in $verses)
+                #set($index = $foreach.count)
+                <article class="verse " data-url="$verse.url" data-chapter-index="$verse.chapterIndex" data-verse-index="$index" data-ref="$verse.refText">
+                    <p class="verbatim">
+                        <img src="$verse.imagePath"/>
+                    </p>
+                </article>
+            #end
+            </section>
+         </div>
+    </body>
+</html>
