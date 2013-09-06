@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.almuallim.browser.spi.impl;
 
 import java.io.File;
@@ -18,13 +14,13 @@ import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
- *
+ * Provides the base javascript files and stylesheets
  * @author Naveed Quadri
  */
 @ServiceProvider(service = JavascriptFrameworkProvider.class)
 public class JqueryFrameworkProvider implements JavascriptFrameworkProvider {
 
-    private String frameworkCode = null;
+    private String frameworkCode = null;/*Lazily created*/
 
     @Override
     public String getFramework() {
@@ -54,16 +50,6 @@ public class JqueryFrameworkProvider implements JavascriptFrameworkProvider {
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
-//            StringBuilder sb = new StringBuilder();
-//            sb.append(encloseInTag(getClass().getResource("files/js/jquery.min.1.9.0.js").toExternalForm(), "script"));
-//            sb.append(encloseInTag(getClass().getResource("files/js/jquery.contextmenu.js").toExternalForm(), "script"));
-//            sb.append(encloseInTag(getClass().getResource("files/js/jquery.toolbar.js").toExternalForm(), "script"));
-//            sb.append(encloseInTag(getClass().getResource("files/js/jquery.sticky.js").toExternalForm(), "script"));
-//            sb.append(encloseInTag(getClass().getResource("files/js/main.js").toExternalForm(), "script"));
-//            sb.append(encloseInTag(getClass().getResource("files/css/jquery-ui.css").toExternalForm(), "link"));
-//            sb.append(encloseInTag(getClass().getResource("files/css/jquery.contextmenu.css").toExternalForm(), "link"));
-////            sb.append(encloseInTag(getClass().getResource("files/css/jquery.toolbar.css").toExternalForm(), "link"));
-//            sb.append(encloseInTag(getClass().getResource("files/css/main.css").toExternalForm(), "link"));
             frameworkCode = sb.toString();
         }
         return frameworkCode;

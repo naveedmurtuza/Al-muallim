@@ -14,5 +14,7 @@ import java.util.Collection;
 public interface SearchIndexer {
     
     public void index(Collection<SearchDocument> docs) throws IOException;
+    
+    public void deleteDocument(String key,String value) throws IOException;
 
 }

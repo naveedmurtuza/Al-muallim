@@ -24,7 +24,7 @@ import org.w3c.dom.Document;
  *
  * @author Naveed
  */
-@ServiceProvider(service = BrowserAddIn.class)
+@ServiceProvider(service = BrowserAddIn.class, position = 3)
 public class ZoomResetAddin implements BrowserAddIn {
 
     private WebView view;
@@ -60,10 +60,7 @@ public class ZoomResetAddin implements BrowserAddIn {
         return EnumSet.of(ActionDisplayPosition.TOOLBAR);
     }
 
-    @Override
-    public int getPosition() {
-        return 3;
-    }
+    
 
     @Override
     public boolean separatorAfter() {

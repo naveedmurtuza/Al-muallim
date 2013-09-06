@@ -1,3 +1,8 @@
+/**
+ * Replaces one or more format items in a specified string with the string representation 
+ * of a specified object. C# Style
+ * @returns {unresolved}
+ */
 String.prototype.format = function() {
     var args = arguments;
     return this.replace(/\{\{|\}\}|\{(\d+)\}/g, function(m, n) {
@@ -10,6 +15,12 @@ String.prototype.format = function() {
         return args[n];
     });
 };
+/**
+ * JQuery 1.9 deprecated the toggle function. Just Convenience method to replace that
+ * @param {type} a function to call if in toggled state
+ * @param {type} b function to call if not in toggled state
+ * @returns {unresolved}
+ */
 $.fn.clicktoggle = function(a, b) {
     return this.each(function() {
         var clicked = false;
@@ -23,6 +34,18 @@ $.fn.clicktoggle = function(a, b) {
         });
     });
 };
+/**
+ * Flashes (highlights) the current selector
+ * @param {type} options an array containing options
+ *<pre><code>
+ *var config = {
+ *      'highlightColor': '#FFFF9C',
+ *      'duration': 1000,
+ *      'removeBackground': true
+ *  };
+ *</code></pre>
+ * @returns {undefined}
+ */
 $.fn.flash = function(options) {
     var config = {
         'highlightColor': '#FFFF9C',
@@ -51,6 +74,20 @@ $.fn.flash = function(options) {
         });
     }
 };
+/**
+ * 
+ * Enusures the given selector is visible by scrolling to the selector. Option to flash, highlight
+ * the selector.
+ * @param {type} options an array containing options
+ * <pre><code>
+ * var config = {
+ *   'highlightColor': '#FFFF9C',
+ *    'flash': true,
+ *     'duration': 1000,
+ *      'removeBackground': true
+ *   };
+ * </code></pre>
+ * @returns {undefined} */
 $.fn.ensureVisible = function(options) {
     var container = $(this);
     var config = {
@@ -79,21 +116,37 @@ $(document).ready(function() {
 
 });
 
+/**
+ * displays the animated loader
+ * @returns {undefined}
+ */
 function showLoader()
 {
     $("#loader").removeClass("hidden");
 }
 
+/**
+ * hides the loader
+ * @returns {undefined}
+ */
 function hideLoader()
 {
     $("#loader").addClass("hidden");
 }
 
+/**
+ * Gets the data-url attribute from the document
+ * @returns {String} url
+ */
 function getUrl()
 {
     return $('#document').data('url');
 }
-
+/**
+ * Displays a information bar
+ * @param {String} text
+ * @returns {noty}
+ */
 function notifyInformation(text)
 {
     var n = noty({
@@ -105,6 +158,11 @@ function notifyInformation(text)
     });
     return n;
 }
+/**
+ * Displays a error bar
+ * @param {String} text
+ * @returns {noty}
+ */
 function notifyError(text)
 {
     var n = noty({
@@ -116,6 +174,11 @@ function notifyError(text)
     });
     return n;
 }
+/**
+ * Displays a warning bar
+ * @param {String} text
+ * @returns {noty}
+ */
 function notifyWarning(text)
 {
     var n = noty({
@@ -127,6 +190,11 @@ function notifyWarning(text)
     });
     return n;
 }
+/**
+ * Displays a success bar
+ * @param {String} text
+ * @returns {noty}
+ */
 function notifySuccess(text)
 {
     var n = noty({
@@ -138,6 +206,11 @@ function notifySuccess(text)
     });
     return n;
 }
+/**
+ * Displays a notification bar
+ * @param {String} text
+ * @returns {noty}
+ */
 function notify(text)
 {
     var n = noty({
@@ -150,35 +223,26 @@ function notify(text)
     return n;
 }
 
-
-function scrollTo(selector)
+function getSelectItem()
 {
-    $('html, body').animate({
-        scrollTop: $(selector).offset().top - 20
-    }, 2000, function() {
-        flashColor(selector);
-    });
+    return   $('article.selected').data();
 }
-
-function flashColor(selector)
-{
-    var container = $(selector);
-    if (container.length)
-    {
-        var originalColor = container.css('backgroundColor');
-//the container background is returning tranparent!!
-//and is messing with my hover color.. so just bad fix!
-//        var originalColor = "#FFFFFF";
-        container.animate({
-            backgroundColor: "#FFFF9C"
-        }, 1000, 'linear', function() {
-            $(this).animate({
-                backgroundColor: originalColor
-            }, 1000, function() {
-                //my hover fix! the hover color change was not working
-                //without this snippet
-                $(selector).css('background-color', '');
-            });
-        });
+/**
+ * @see http://stackoverflow.com/a/5379408
+ * @returns {String} selected text
+ */
+function getSelectionText() {
+    var text = "";
+    if (window.getSelection) {
+        text = window.getSelection().toString();
+        // The second branch is for IE <= 8 (IE 9 implements window.getSelection()). 
+        // The document.selection.type check is testing that the selection is a text selection rather 
+        // than a control selection. In IE, a control selection is a selection inside an editable
+        //  element containing one or more elements (such as images and form controls)
+        //   with outlines and resize handles. If you call .createRange() on such a selection, 
+        //   you get a ControlRange rather than a TextRange, and ControlRanges have no text property
+    } else if (document.selection && document.selection.type !== "Control") {
+        text = document.selection.createRange().text;
     }
+    return text;
 }

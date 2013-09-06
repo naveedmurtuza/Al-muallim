@@ -4,12 +4,10 @@
  */
 package org.almuallim.theholyquran.browseraddin.translation;
 
+import org.almuallim.theholyquran.TranslatorsPanel;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -22,18 +20,17 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
+import netscape.javascript.JSObject;
 import org.almuallim.service.browser.BrowserAddIn;
 import org.almuallim.service.browser.JSEngine;
 import org.almuallim.service.browser.ActionDisplayPosition;
 import org.almuallim.service.browser.ActionDisplayStyle;
 import org.almuallim.service.helpers.EscapeUtils;
-import org.almuallim.service.helpers.JSONUtils;
 import org.almuallim.service.helpers.JavaFX;
 import org.almuallim.service.url.AlmuallimURL;
 import org.almuallim.theholyquran.ModuleConstants;
 import org.almuallim.theholyquran.api.TheHolyQuran;
 import org.almuallim.theholyquran.api.VerseCollection;
-import org.almuallim.theholyquran.browseraddin.fontstyle.FontStylePanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -45,7 +42,7 @@ import org.w3c.dom.Document;
  *
  * @author Naveed
  */
-@ServiceProvider(service = BrowserAddIn.class)
+@ServiceProvider(service = BrowserAddIn.class, position = 10)
 public class TranslationAddin implements BrowserAddIn {
 
     private final Set<Integer> translatorIds;
@@ -88,26 +85,30 @@ public class TranslationAddin implements BrowserAddIn {
                 String transVal = AlmuallimURL.getParameter(url, "translator");
                 final String verseVal = AlmuallimURL.getParameter(url, "verse");
                 if (!Strings.isNullOrEmpty(transVal)) {
-                  final  int transId = Integer.parseInt(transVal);
+                    final int transId = Integer.parseInt(transVal);
                     if (!translatorIds.contains(transId)) {
                         translatorIds.add(transId);
                     }
-                    
+
                 }
                 chapter = Integer.parseInt(chapterVal);
-                for (Integer integer : translatorIds) {
-                    VerseCollection verseCollection = theHolyQuran.translateVerses(chapter, integer);
-                    addTranslation(verseCollection.toJSON());
+                for (Integer translatorId : translatorIds) {
+                    VerseCollection verseCollection = theHolyQuran.translateVerses(chapter, translatorId);
+                    if (verseCollection == null) {
+                        //possibly the translatotion has been deleted
+                        translatorIds.remove(translatorId);
+                    } else {
+                        addTranslation(verseCollection.toJSON());
+                    }
                 }
-                if(!Strings.isNullOrEmpty(verseVal))
-                {
-                  JavaFX.invokeAndWait(new Runnable() {
+                if (!Strings.isNullOrEmpty(verseVal)) {
+                    JavaFX.invokeAndWait(new Runnable() {
                         @Override
                         public void run() {
                             String selector = "article[data-verse-index=" + verseVal + "]";
                             TranslationAddin.this.engine.executeScript(String.format("$('%s').ensureVisible()", selector));
                         }
-                    });  
+                    });
                 }
             }
         }).start();
@@ -131,11 +132,10 @@ public class TranslationAddin implements BrowserAddIn {
         return EnumSet.of(ActionDisplayPosition.TOOLBAR);
     }
 
-    @Override
-    public int getPosition() {
-        return 10;
-    }
-
+//    @Override
+//    public int getPosition() {
+//        return 10;
+//    }
     @Override
     public boolean separatorAfter() {
         return false;
@@ -157,10 +157,10 @@ public class TranslationAddin implements BrowserAddIn {
     }
 
     private void addTranslation(final String json) {
-        System.out.println(EscapeUtils.escapeJava(json) );
+        System.out.println(EscapeUtils.escapeJava(json));
         executeJScript("addTranslation(\"" + EscapeUtils.escapeJava(json) + "\");");
-        
-        
+
+
     }
 
     private void executeJScript(final String script) {
@@ -189,7 +189,13 @@ public class TranslationAddin implements BrowserAddIn {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-//            FontStylePanel spanel= new FontStylePanel();
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    Object executeScript = engine.executeScript("getSelectItem();");
+                    Object member = ((JSObject)executeScript).getMember("ref");
+                }
+            });
             TranslatorsPanel panel = new TranslatorsPanel();
             panel.buildTree(translatorIds);
             DialogDescriptor dd = new DialogDescriptor(panel, "Select Translations");

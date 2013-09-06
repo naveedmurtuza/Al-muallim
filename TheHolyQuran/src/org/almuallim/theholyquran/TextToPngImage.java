@@ -33,13 +33,13 @@ import javax.imageio.ImageIO;
 
 
 public class TextToPngImage {
-    private static final Logger LOG = Logger.getLogger(TextToSVGImage.class.getName());
+    private static final Logger LOG = Logger.getLogger(TextToPngImage.class.getName());
 
     
     private static Font font;//new Font("noorehuda", Font.PLAIN, 32);
     static {
         try {
-            Font f = Font.createFont(Font.PLAIN, TextToSVGImage.class.getResourceAsStream("noorehuda.ttf"));
+            Font f = Font.createFont(Font.PLAIN, TextToPngImage.class.getClassLoader().getResourceAsStream("org/almuallim/theholyquran/data/noorehuda.ttf"));
             font = f.deriveFont(32f);
         } catch (IOException | FontFormatException e) {
             LOG.log(Level.SEVERE, "Unable to create Font! Text to Png conversion will be done using default font", e);

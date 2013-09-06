@@ -79,7 +79,7 @@ public class ModuleActivation extends SwingWorker<Boolean, String> {
             String dir = Application.getHome() + File.separatorChar + "TheHolyQuran" + File.separatorChar + "svg" + File.separatorChar;
             new File(dir).mkdirs();
             System.out.println(Toolkit.getDefaultToolkit().getScreenSize());
-            Scanner scanner = new Scanner(TextToPngImage.class.getResourceAsStream("quran-noor-e-hidayat"), "utf-8");
+            Scanner scanner = new Scanner(TextToPngImage.class.getClassLoader().getResourceAsStream("org/almuallim/theholyquran/data/quran-noor-e-hidayat"), "utf-8");
             int index = 1;
             setProgress(0);
             while (scanner.hasNextLine()) {
@@ -96,7 +96,7 @@ public class ModuleActivation extends SwingWorker<Boolean, String> {
                 index++;
             }
         } catch (IOException ex) {
-            Logger.getLogger(TextToSVGImage.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ModuleActivation.class.getName()).log(Level.SEVERE, null, ex);
         }
         long end = System.currentTimeMillis();
         long timeTakenMs = end - start;

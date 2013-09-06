@@ -24,7 +24,7 @@ import org.w3c.dom.Document;
  *
  * @author Naveed
  */
-@ServiceProvider(service = BrowserAddIn.class)
+@ServiceProvider(service = BrowserAddIn.class,position = 1)
 public class ReloadAddin implements BrowserAddIn {
 
     private Document dom;
@@ -47,11 +47,7 @@ public class ReloadAddin implements BrowserAddIn {
         return EnumSet.of(ActionDisplayPosition.TOOLBAR);
     }
 
-    @Override
-    public int getPosition() {
-        return 1;
-    }
-
+    
     @Override
     public void init(Document dom, JSEngine engine, WebView view) {
         this.dom = dom;

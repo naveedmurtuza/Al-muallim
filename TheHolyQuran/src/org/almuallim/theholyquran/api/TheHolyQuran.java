@@ -253,21 +253,26 @@ public class TheHolyQuran implements ModuleConstants {
         return incompleteTranslators;
     }
 
-    public void deleteTranslation(int id) {
+    public void deleteTranslation(Translator t) {
         try (Connection connection = getConnection()) {
             try (PreparedStatement pstmt = connection.prepareStatement("DELETE FROM VERSE_I18N WHERE TRANSLATOR_ID = ?")) {
-                pstmt.setInt(1, id);
+                pstmt.setInt(1, t.getId());
                 pstmt.executeUpdate();
+            }
+            try (PreparedStatement pstmt = connection.prepareStatement("DELETE FROM TRANSLATOR WHERE ID = ?")) {
+                pstmt.setInt(1, t.getId());
+                pstmt.executeUpdate();
+            }
+            SearchIndexer indexer = Lookup.getDefault().lookup(SearchIndexer.class);
+            if (indexer != null) {
+                indexer.deleteDocument("translator", t.getName());
             }
         } catch (SQLException ex) {
             Logger.getLogger(TheHolyQuran.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
-    }
 
-    public void deleteTranslations(int[] ids) {
-        for (int id : ids) {
-            deleteTranslation(id);
-        }
     }
 
     public VerseCollection previewTranslation(String path, TanzilParser parser) throws IOException {

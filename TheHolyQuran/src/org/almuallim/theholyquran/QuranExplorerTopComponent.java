@@ -5,24 +5,17 @@
 package org.almuallim.theholyquran;
 
 import java.awt.BorderLayout;
-import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import javax.swing.JComboBox;
-import javax.swing.SwingWorker;
-import static javax.swing.SwingWorker.StateValue.DONE;
+import netscape.javascript.JSObject;
 import org.almuallim.theholyquran.api.Language;
 import org.almuallim.theholyquran.api.TheHolyQuran;
 import org.almuallim.theholyquran.nodes.ChapterCollection;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.DialogDescriptor;
-import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
@@ -31,7 +24,6 @@ import org.openide.explorer.view.BeanTreeView;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.util.Exceptions;
-import org.openide.util.HelpCtx;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
@@ -75,7 +67,6 @@ public final class QuranExplorerTopComponent extends TopComponent implements Exp
         add(langComboBox, BorderLayout.PAGE_START);
         add(btv, BorderLayout.CENTER);
         btv.setRootVisible(false);
-
     }
 
     /**

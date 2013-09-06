@@ -2,6 +2,7 @@ package org.almuallim.lucene.search;
 
 import java.io.File;
 import org.almuallim.service.helpers.Application;
+import org.almuallim.service.helpers.EscapeUtils;
 import org.almuallim.service.search.SearchCallback;
 import org.almuallim.service.search.SearchProvider;
 import org.almuallim.service.search.SearchResult;
@@ -41,7 +42,7 @@ public class BasicSearchProvider implements SearchProvider {
                 String name = field.name();
                 switch (name) {
                     case "abstract":
-                        sr.setAbstractTxt(field.stringValue());
+                        sr.setAbstractTxt(EscapeUtils.escapeJava(field.stringValue()));
                         break;
                     case "title":
                         sr.setTitle(field.stringValue());

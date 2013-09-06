@@ -127,10 +127,7 @@ public class FontStyleAddin implements BrowserAddIn {
         return EnumSet.of(ActionDisplayPosition.TOOLBAR);
     }
 
-    @Override
-    public int getPosition() {
-        return 1234;
-    }
+    
 
     @Override
     public boolean separatorAfter() {

@@ -1,20 +1,16 @@
 package org.almuallim.lucene.search;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import org.almuallim.service.helpers.Application;
 import org.almuallim.service.search.SearchDocument;
 import org.almuallim.service.search.SearchIndexer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.IndexAccess;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
+import org.apache.lucene.index.Term;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -24,14 +20,20 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = SearchIndexer.class)
 public class LuceneSearchIndexer implements SearchIndexer {
 
-
     @Override
     public void index(Collection<SearchDocument> sdocs) throws IOException {
-        try (IndexWriter indexWriter = getWriter()) {
-            for (SearchDocument searchDocument : sdocs) {
-                addDoc(indexWriter, searchDocument);
-            }
+        IndexWriter indexWriter = IndexAccess.getWriter();
+        for (SearchDocument searchDocument : sdocs) {
+            addDoc(indexWriter, searchDocument);
         }
+    }
+
+    @Override
+    public void deleteDocument(String key, String value) throws IOException {
+        Term term = new Term(key, value);
+        IndexWriter writer = IndexAccess.getWriter();
+        writer.deleteDocuments(term);
+        writer.commit();
     }
 
     private void addDoc(IndexWriter indexWriter, SearchDocument sdoc) throws IOException {
@@ -53,9 +55,5 @@ public class LuceneSearchIndexer implements SearchIndexer {
             }
         }
         indexWriter.addDocument(doc);
-    }
-
-    private IndexWriter getWriter() throws IOException {
-        return new IndexWriter(FSDirectory.open(new File(Application.getHome() + File.separator + "index")), new IndexWriterConfig(Version.LUCENE_36, new StandardAnalyzer(Version.LUCENE_36)));
     }
 }

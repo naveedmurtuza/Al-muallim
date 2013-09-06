@@ -31,12 +31,12 @@ public interface BrowserAddIn {
      */
     public EnumSet<ActionDisplayPosition> getDisplayPosition();
     
-    /**
-     * 
-     * @return the position of the action
-     * @deprecated use position attribute in service annotation instead
-     */
-    public int getPosition();
+//    /**
+//     * 
+//     * @return the position of the action
+//     * @deprecated use position attribute in service annotation instead
+//     */
+//    public int getPosition();
     
     /**
      * Do all initialization of the plugin here. 

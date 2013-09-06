@@ -13,7 +13,6 @@ import org.almuallim.service.browser.BrowserAddIn;
 import org.almuallim.service.browser.JSEngine;
 import org.almuallim.service.browser.ActionDisplayPosition;
 import org.almuallim.service.browser.ActionDisplayStyle;
-import org.almuallim.service.helpers.JavaFX;
 import org.almuallim.service.search.SearchCallback;
 import org.almuallim.service.search.SearchResult;
 import org.almuallim.service.url.AlmuallimURL;
@@ -27,7 +26,7 @@ import org.w3c.dom.Document;
  *
  * @author Naveed Quadri
  */
-@ServiceProvider(service = BrowserAddIn.class)
+@ServiceProvider(service = BrowserAddIn.class, position = 9999)
 public class SearchAddin implements BrowserAddIn {
 
     private WebView view;
@@ -49,10 +48,7 @@ public class SearchAddin implements BrowserAddIn {
         return EnumSet.of(ActionDisplayPosition.NONE);
     }
 
-    @Override
-    public int getPosition() {
-        return 1000;
-    }
+    
 
     @Override
     public void init(Document dom, JSEngine engine, WebView view) {
@@ -112,16 +108,7 @@ public class SearchAddin implements BrowserAddIn {
     public class SearchButtonAction {
 
         public void actionPerformed(final String query, int pageNumber) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    Object o = engine.executeScript("$('html').clone().html();");
-
-//                           ((JSObject)o).eval(NAME);
-                    int f = 1;
-
-                }
-            });
+            
             System.out.println(query);
             final Gson gson = new Gson();
             BasicSearchProvider searchProvider = new BasicSearchProvider();
@@ -129,10 +116,8 @@ public class SearchAddin implements BrowserAddIn {
                 searchProvider.search(query, new SearchCallback() {
                     @Override
                     public void resultFound(String term, float score, SearchResult result) {
-                        //                            jsEngine.executeScript("add");
 
                         final String json = gson.toJson(result);
-                        System.out.println(json);
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
@@ -145,11 +130,7 @@ public class SearchAddin implements BrowserAddIn {
                     @Override
                     public void run() {
                         engine.executeScript("removeAnimation();");
-                        //("#search").removeClass("hidden")
                         engine.executeScript("$('#search').removeClass('main').addClass('header');");
-
-                        //install waypoint to fetch more results when the 
-                        //user scrolls down
                     }
                 });
             } catch (Exception ex) {

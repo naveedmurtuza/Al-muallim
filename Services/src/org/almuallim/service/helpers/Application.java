@@ -1,8 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.almuallim.service.helpers;
+
+import org.openide.modules.Places;
 
 /**
  *
@@ -11,6 +9,6 @@ package org.almuallim.service.helpers;
 public class Application {
 
     public static String getHome() {
-        return System.getProperty("netbeans.user");
+        return Places.getUserDirectory().getAbsolutePath();
     }
 }

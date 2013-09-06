@@ -24,7 +24,7 @@ import org.w3c.dom.Document;
  *
  * @author Naveed
  */
-@ServiceProvider(service = BrowserAddIn.class)
+@ServiceProvider(service = BrowserAddIn.class, position = 4)
 public class ZoomOutAddin implements BrowserAddIn {
 
     private WebView view;
@@ -61,10 +61,7 @@ public class ZoomOutAddin implements BrowserAddIn {
         return EnumSet.of(ActionDisplayPosition.TOOLBAR);
     }
 
-    @Override
-    public int getPosition() {
-        return 4;
-    }
+    
 
     @Override
     public boolean separatorAfter() {

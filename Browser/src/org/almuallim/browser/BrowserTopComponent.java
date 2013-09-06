@@ -72,7 +72,7 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
     private JFXPanel browserFxPanel;
     private WebEngine engine;
     private AlmuallimURL url;
-    private List<? extends BrowserAddIn> browserAddins;
+    private Collection<? extends BrowserAddIn> browserAddins;
     private boolean padeLoaded;
     private int scroll;
     private JSObject jsWindowObject;
@@ -92,19 +92,7 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Collection<? extends BrowserAddIn> l = Lookup.getDefault().lookupAll(BrowserAddIn.class);
-                browserAddins = new ArrayList<>(l);
-
-                Collections.sort(browserAddins, new Comparator<BrowserAddIn>() {
-                    @Override
-                    public int compare(BrowserAddIn o1, BrowserAddIn o2) {
-                        return compare(o1.getPosition(), o2.getPosition());
-                    }
-
-                    private int compare(int x, int y) {
-                        return (x < y) ? -1 : ((x == y) ? 0 : 1);
-                    }
-                });
+                browserAddins  = Lookup.getDefault().lookupAll(BrowserAddIn.class);
             }
         }).start();
     }
@@ -268,9 +256,9 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
 
     private void createFxBrowser() {
         view = new WebView();
-//        view.setContextMenuEnabled(false);
+        view.setContextMenuEnabled(false);
         engine = view.getEngine();
-        enableFirebug(engine);
+//        enableFirebug(engine);
         engine.setOnAlert(new EventHandler<WebEvent<String>>() {
             @Override
             public void handle(WebEvent<String> t) {
@@ -292,14 +280,18 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
         });
         browserFxPanel.setScene(new Scene(view));
     }
- /**
-   * Enables Firebug Lite for debugging a webEngine.
-   * @param engine the webEngine for which debugging is to be enabled.
-   */
-  private static void enableFirebug(final WebEngine engine) {
-    engine.executeScript("if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', 'https://getfirebug.com/' + 'firebug-lite.js' + '#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', 'https://getfirebug.com/' + '#startOpened');}"); 
-  }
+
+    /**
+     * Enables Firebug Lite for debugging a webEngine. could not make it work..
+     *
+     * @param engine the webEngine for which debugging is to be enabled.
+     */
+    private static void enableFirebug(final WebEngine engine) {
+        engine.executeScript("if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', 'https://getfirebug.com/' + 'firebug-lite.js' + '#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', 'https://getfirebug.com/' + '#startOpened');}");
+    }
+
     private void installBrowserAddins() {
+        
         jToolBar1.removeAll();
         //register a callback for handling click events
         jsWindowObject.setMember("contextMenu", new ContextMenuActionListener());
@@ -309,15 +301,19 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
         cmenuScript.append("$('body').contextPopup({");
         cmenuScript.append("title: 'Al-muallim',");
         cmenuScript.append("items: [");
-        
+
         for (BrowserAddIn browserAddIn : browserAddins) {
             String modules = browserAddIn.getSupportedModules();
+            //if the mocule is not supported, ignore this addin
             boolean supported = modules.contains(url.getModuleName()) || "ALL".equals(modules);
             if (!supported) {
                 continue;
             }
+            //let the addin does some initialization
             browserAddIn.init(engine.getDocument(), getJSEngine(), view);
+            //get the action
             Action a = browserAddIn.getAction();
+            //add to context menu, if required
             if (browserAddIn.getDisplayPosition().contains(ActionDisplayPosition.CONTEXT_MENU)) {
                 cmenuScript.append("{");
                 cmenuScript.append(String.format("label: '%s'", a.getValue(Action.NAME)));
@@ -326,6 +322,7 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
                 cmenuScript.append("},");
                 menuItemCount++;
             }
+            //or to toolbar
             if (browserAddIn.getDisplayPosition().contains(ActionDisplayPosition.TOOLBAR)) {
                 if (browserAddIn.separatorBefore()) {
                     jToolBar1.addSeparator();

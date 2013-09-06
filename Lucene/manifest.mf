@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
 OpenIDE-Module: org.apache.lucene
+OpenIDE-Module-Install: org/apache/lucene/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/apache/lucene/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
 

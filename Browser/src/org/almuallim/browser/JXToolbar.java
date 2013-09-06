@@ -11,7 +11,7 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
 /**
- *
+ * Custom JToolbar implementation to support keyboard shortcuts
  * @author Naveed Quadri
  * http://stackoverflow.com/questions/8517435/having-trouble-to-find-shortcut-key-to-jtoolbar-in-swings
  */

@@ -32,7 +32,9 @@ public class SearchDocument {
         this.url = url;
         this.moduleName = moduleName;
         abstractText = text.substring(0, Math.min(100, text.length()));
-        abstractText += " ...";
+        if (text.length() > 100) {
+            abstractText += " ...";
+        }
     }
 
     public String getText() {
@@ -61,11 +63,10 @@ public class SearchDocument {
 
     /**
      * The parameters are stored as is in the index
-     * @param parameters 
+     *
+     * @param parameters
      */
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
-    
-    
 }
