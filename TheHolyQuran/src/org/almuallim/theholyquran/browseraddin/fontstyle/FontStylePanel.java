@@ -1,46 +1,45 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.almuallim.theholyquran.browseraddin.fontstyle;
 
+import com.google.common.base.Strings;
+import com.osbcp.cssparser.PropertyValue;
+import com.osbcp.cssparser.Rule;
+import com.osbcp.cssparser.Rules;
+import com.osbcp.cssparser.Selector;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.List;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
+import java.util.Set;
+import javax.swing.SwingWorker;
 import org.almuallim.service.database.Database;
 import org.almuallim.service.helpers.LanguageUtils;
 import org.almuallim.theholyquran.api.Translator;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import org.openide.util.NbPreferences;
 
 /**
- * Note: The color/background-color is disable as of now. The logic for saving the style
- * is not perfect. lots of shortcomings. one being if  press ok without changing anything 
- * the current style will saved!  hope i was clear. Instead we need a mechanism to save the style
- * only if it is changed!!! Since this is just cosmetic decided to disable it for now.
- * 
+ *
  * @author Naveed
  */
 public class FontStylePanel extends javax.swing.JPanel {
 
-    private final Preferences translatorStyles;
-    private final Preferences defaultStyles;
     private final JFontChooser pe;
+    private List<Rule> rules;
+    private Rule currentRule;
+    private boolean styleChanged;
 
     /**
      * Creates new form FontStylePanel
      */
-    public FontStylePanel() {
+    public FontStylePanel(List<Rule> ruless) {
         initComponents();
-        translatorStyles = NbPreferences.forModule(getClass()).node("styles/translator");
-        defaultStyles = NbPreferences.forModule(getClass()).node("styles/default");
+        this.rules = ruless;
         pe = new JFontChooser();
         add(pe, BorderLayout.CENTER);
         ColorComboBox.init(cbForeground);
@@ -52,97 +51,174 @@ public class FontStylePanel extends javax.swing.JPanel {
         jComboBox1.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                Translator item = (Translator) e.getItem();
-                Preferences childTranslator = translatorStyles.node("" + item.getId());
-                String langCode = item.getLanguage().getIso2Code();
+                Translator translator = (Translator) e.getItem();
+                String langCode = translator.getLanguage().getIso2Code();
+
                 switch (e.getStateChange()) {
                     case ItemEvent.SELECTED:
                         //update checkbox label
                         jCheckBox1.setText(String.format("Use this as a default style for %s", LanguageUtils.getLanguageName(langCode)));
-                        //load the values
-                        String fontFamily = childTranslator.get("font-family", "");
-                        if (!fontFamily.isEmpty()) {
-                            int size = childTranslator.getInt("font-size", 12);
-                            int style = childTranslator.getInt("font-style", Font.PLAIN);
-                            Font f = new Font(fontFamily, style, size);
-                            pe.setSelectedFont(f);
-                        }
-                        /*String foreground = childTranslator.get("color", "");
-                        if (!foreground.isEmpty()) {
-                            ColorComboBox.setColor(cbForeground, ColorUtils.fromHexFormat(foreground));
-                        }
-                        String background = childTranslator.get("background-color", "");
-                        if (!background.isEmpty()) {
-                            ColorComboBox.setColor(cbBackground, ColorUtils.fromHexFormat(background));
-                        }*/
-                        try {
-                            //look if we have default for this
-                            jCheckBox1.setSelected(java.util.Arrays.asList(defaultStyles.childrenNames()).contains(langCode));
-                        } catch (BackingStoreException ex) {
-                            Exceptions.printStackTrace(ex);
+                        Selector translatorSelector = new Selector(MessageFormat.format("p[data-translator-id=\"{0}\"]", translator.getId()));
+                        Selector langSelector = new Selector(MessageFormat.format("p[data-language=\"{0}\"]", translator.getId()));
+                        for (Rule rule : rules) {
+                            if (rule.getSelectors().contains(translatorSelector)) {
+                                currentRule = rule;
+                                Set<PropertyValue> propertyValues = rule.getPropertyValues();
+                                String fontFamily = "", foreground, background, fontStyle = "", fontWeight = "";
+                                int size = 0;
+                                for (PropertyValue propertyValue : propertyValues) {
+                                    switch (propertyValue.getProperty()) {
+                                        //font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
+                                        case "font-family":
+                                            fontFamily = propertyValue.getValue();
+                                            break;
+                                        case "font-size":
+                                            String value = propertyValue.getValue();
+                                            size = Integer.parseInt(value.substring(0, value.length() - 2));
+                                            break;
+                                        case "font-style":
+                                            fontStyle = propertyValue.getValue();
+                                            break;
+                                        case "font-weight":
+                                            fontWeight = propertyValue.getValue();
+                                            break;
+                                        case "foreground":
+                                            foreground = propertyValue.getValue();
+                                            break;
+                                        case "background":
+                                            background = propertyValue.getValue();
+                                            break;
+                                    }
+                                }
+                                Font f = new Font(fontFamily, toJavaStyle(fontStyle, fontWeight), size);
+                                pe.setSelectedFont(f);
+                            }
+                            jCheckBox1.setSelected(rule.getSelectors().contains(langSelector));
+                            break;
                         }
                         break;
                     case ItemEvent.DESELECTED:
-                        //save the values
-                        Font f = (Font) pe.getSelectedFont();
-                        if (f == null) {
-                            return;
-                        }
-                        if (!jCheckBox1.isSelected()) {
-                            try {
-                                //so lets see if there is any default for this
-                                //if yes
-                                //delete the node
-                                if (java.util.Arrays.asList(defaultStyles.childrenNames()).contains(langCode)) {
-                                    defaultStyles.node(langCode).clear();
-                                }
-                            } catch (BackingStoreException ex) {
-                                Exceptions.printStackTrace(ex);
-                            }
-                        }
-                        saveStyle(childTranslator, f, item.getLanguage().getIso2Code());
+                        if (currentRule != null && styleChanged) {
+                        Rules.addOrUpdate(rules, currentRule);
+                        styleChanged = false;
+                    }
+//                        
                         break;
                 }
             }
+
         });
+
+        SwingWorker<Void, Translator> worker = new SwingWorker<Void, Translator>() {
+
+            @Override
+            protected Void doInBackground() throws Exception {
+                Database database = Lookup.getDefault().lookup(Database.class);
+                try (Connection connection = database.getConnection()) {
+                    List<Translator> all = Translator.all(connection);
+                    for (Translator translator : all) {
+                        //ignore the verbatim
+                        if (translator.getId() == 1) {
+                            continue;
+                        }
+                        publish(translator);
+                    }
+                } catch (SQLException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+                return null;
+            }
+
+            @Override
+            protected void process(List<Translator> chunks) {
+                for (Translator translator : chunks) {
+                    jComboBox1.addItem(translator);
+                }
+            }
+
+        };
+        worker.execute();
+
+        pe.addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+
+                if (evt.getPropertyName().equalsIgnoreCase("FONT_STYLE_CHANGE")) {
+                    if (currentRule == null) {
+                        Translator translator = (Translator) jComboBox1.getSelectedItem();
+                        Selector translatorSelector = new Selector(MessageFormat.format("p[data-translator-id=\"{0}\"]", translator.getId()));
+                        currentRule = new Rule(translatorSelector);
+                    }
+                    Font f = (Font) pe.getSelectedFont();
+                    currentRule.addPropertyValue(new PropertyValue("font-family", f.getFontName()));
+                    currentRule.addPropertyValue(new PropertyValue("font-size", "" + f.getSize() + "px"));
+                    String css = toCssFontStyle(f.getStyle());
+                    for (String prop : css.split(";")) {
+                        String[] s = prop.split(":");
+                        currentRule.addPropertyValue(new PropertyValue(s[0], s[1]));
+                    }
+                    styleChanged = true;
+                }
+            }
+        });
+        jCheckBox1.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Translator translator = (Translator) jComboBox1.getSelectedItem();
+                Selector langSelector = new Selector(MessageFormat.format("p[data-language=\"{0}\"]", translator.getId()));
+                if (currentRule == null) {
+                    currentRule = new Rule();
+                }
+
+                if (jCheckBox1.isSelected()) {
+                    currentRule.addSelector(langSelector);
+                } else {
+                    currentRule.removeSelector(langSelector);
+                }
+                styleChanged = true;
+            }
+        });
+
     }
 
-    private void saveStyle(Preferences childTranslator, Font f, String defaultNode) {
-        childTranslator.put("font-family", f.getFontName());
-        childTranslator.putInt("font-size", f.getSize());
-        childTranslator.putInt("font-style", f.getStyle());
-//        childTranslator.put("color", ColorUtils.toHexFormat(ColorComboBox.getColor(cbForeground)));
-//        childTranslator.put("background-color", ColorUtils.toHexFormat(ColorComboBox.getColor(cbBackground)));
-        if (jCheckBox1.isSelected()) {
-            Preferences childDefault = defaultStyles.node(defaultNode);
-            childDefault.put("font-family", f.getFontName());
-            childDefault.putInt("font-size", f.getSize());
-            childDefault.putInt("font-style", f.getStyle());
-//            childTranslator.put("color", ColorUtils.toHexFormat(ColorComboBox.getColor(cbForeground)));
-//            childTranslator.put("background-color", ColorUtils.toHexFormat(ColorComboBox.getColor(cbBackground)));
-
+    private String toCssFontStyle(int style) {
+        switch (style) {
+            case Font.BOLD:
+                return "font-weight:bold";
+            case Font.PLAIN:
+                return "font-style:normal";
+            case Font.ITALIC:
+                return "font-style:italic";
+            case Font.BOLD | Font.ITALIC:
+                return "font-weight:bold;font-style:italic";
         }
+        return "";
     }
 
-    public void save() {
+    private int toJavaStyle(String fontStyle, String fontWeight) {
+        int style = Font.PLAIN;
+        if (!Strings.isNullOrEmpty(fontWeight)) {
+            style |= Font.BOLD;
+        }
+        if (!Strings.isNullOrEmpty(fontStyle)) {
+            if ("italic".equalsIgnoreCase(fontStyle)) {
+                style |= Font.ITALIC;
+            }
+        }
+        return style;
 
-        //save the current style
-        Translator item = (Translator) jComboBox1.getSelectedItem();
-        Preferences childTranslator = translatorStyles.node("" + item.getId());
-        Font f = (Font) pe.getSelectedFont();
-        if (f == null) {
-            return;
-        }
-        saveStyle(childTranslator, f, item.getLanguage().getIso2Code());
-        try {
-            translatorStyles.flush();
-            defaultStyles.flush();
-        } catch (BackingStoreException ex) {
-            Exceptions.printStackTrace(ex);
-        }
     }
 
-    
+    public List<Rule> getRules() {
+        if (currentRule != null && styleChanged) {
+            Rules.addOrUpdate(rules, currentRule);
+            styleChanged = false;
+        }
+        return rules;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -228,20 +304,5 @@ public class FontStylePanel extends javax.swing.JPanel {
     private javax.swing.JLabel lForeground;
     // End of variables declaration//GEN-END:variables
 
-    public void init() {
-        Database database = Lookup.getDefault().lookup(Database.class);
-        try (Connection connection = database.getConnection()) {
-            List<Translator> all = Translator.all(connection);
-            for (Translator translator : all) {
-                //ignore the verbatim
-                if (translator.getId() == 1) {
-                    continue;
-                }
-                jComboBox1.addItem(translator);
-            }
-        } catch (SQLException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-    }
 
 }

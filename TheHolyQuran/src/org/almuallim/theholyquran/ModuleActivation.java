@@ -13,6 +13,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -24,6 +25,7 @@ import javax.swing.SwingWorker;
 import static javax.swing.SwingWorker.StateValue.DONE;
 import org.almuallim.service.database.Database;
 import org.almuallim.service.helpers.Application;
+import org.almuallim.service.helpers.ZipUtils;
 import org.almuallim.theholyquran.api.TheHolyQuran;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -72,35 +74,12 @@ public class ModuleActivation extends SwingWorker<Boolean, String> {
             LOG.info("Creating tables (TheHolyQuran module)");
             TheHolyQuran.onCreateDatabase(connection);
         }
-        TextToPngImage tti = new TextToPngImage();
-        long start = System.currentTimeMillis();
-        try {
-            LOG.info("Converting verses to PNGs");
-            String dir = Application.getHome() + File.separatorChar + "TheHolyQuran" + File.separatorChar + "svg" + File.separatorChar;
+        try(InputStream is = getClass().getClassLoader().getResourceAsStream("org/almuallim/theholyquran/data/verses.zip"))
+        {
+            String dir = Application.getHome() + File.separatorChar + "TheHolyQuran" + File.separatorChar + "verses" + File.separatorChar;
             new File(dir).mkdirs();
-            System.out.println(Toolkit.getDefaultToolkit().getScreenSize());
-            Scanner scanner = new Scanner(TextToPngImage.class.getClassLoader().getResourceAsStream("org/almuallim/theholyquran/data/quran-noor-e-hidayat"), "utf-8");
-            int index = 1;
-            setProgress(0);
-            while (scanner.hasNextLine()) {
-                if (isCancelled()) {
-                    break;
-                }
-                String text = scanner.nextLine();
-                if (text.isEmpty() || text.startsWith("#")) {
-                    continue;
-                }
-                tti.convertToImage(text, 890, 10, 10, Color.black, dir + index + ".png");
-                float progress = (index / 6236f) * 100f;
-                setProgress((int) progress);
-                index++;
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(ModuleActivation.class.getName()).log(Level.SEVERE, null, ex);
+            ZipUtils.extract(is, dir);
         }
-        long end = System.currentTimeMillis();
-        long timeTakenMs = end - start;
-        System.out.println((timeTakenMs / 1000) + " seconds");
         LOG.info("TheHolyQuran module initialized");
         return true;
 

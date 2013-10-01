@@ -21,6 +21,7 @@ import java.util.Objects;
  */
 public class AlmuallimURL {
 
+    
     public static String ClassNameKey = "className";
 
     /**
@@ -40,9 +41,9 @@ public class AlmuallimURL {
         return value;
 
     }
-    private final String url;
+    private String url;
     private static final String PROTOCOL = "almuallim";
-    private final String moduleName;
+    private String moduleName;
     private Map<String, String> parameters;
 
     /**
@@ -76,6 +77,27 @@ public class AlmuallimURL {
             }
         }
     }
+
+    
+
+    /**
+     * Copy Constructor
+     * @param source 
+     */
+    public AlmuallimURL(AlmuallimURL source)
+    {
+        moduleName = source.moduleName;
+        url = source.url;
+        parameters = new HashMap<>(); 
+        for (Map.Entry<String, String> entry : source.parameters.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            parameters.put(key, value);
+        }
+    }
+    
+    
+    
 
     public String getUrl() {
         return toString();

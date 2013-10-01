@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.EnumSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.scene.web.WebView;
 import javax.swing.Action;
@@ -28,6 +30,7 @@ import org.w3c.dom.Document;
  */
 @ServiceProvider(service = BrowserAddIn.class, position = 9999)
 public class SearchAddin implements BrowserAddIn {
+        private static final Logger LOG = Logger.getLogger(SearchAddin.class.getName());
 
     private WebView view;
     private JSEngine engine;
@@ -58,7 +61,7 @@ public class SearchAddin implements BrowserAddIn {
 
         //register java function
         engine.registerJavaFunction("search", new SearchButtonAction());
-        engine.registerJavaFunction("open", new TestOpen());
+        engine.registerJavaFunction("open", new OpenResult());
 
         Platform.runLater(new Runnable() {
             @Override
@@ -83,7 +86,7 @@ public class SearchAddin implements BrowserAddIn {
         return ModuleConstants.MODULE_NAME;
     }
 
-    public class TestOpen {
+    public class OpenResult {
 
         private Browser browser;
 
@@ -134,6 +137,7 @@ public class SearchAddin implements BrowserAddIn {
                     }
                 });
             } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Error searching index", ex);
                 final StringBuilder message = new StringBuilder();
                 String type;
                 if (ex instanceof CorruptIndexException) {

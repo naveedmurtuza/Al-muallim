@@ -78,7 +78,23 @@ section#bismillah p img
 
 article.verse p.verbatim
 {
-    text-align: right;overflow: visible;
+    text-align: right;overflow: visible;font-family: 'me_quran';font-size: 2em;
+    
+}
+
+article.verse p.verbatim span.verse-index
+{
+    font-size: 1em;
+}
+article.verse p.verbatim span.verse-index:before
+{
+        content: '\u06dd';
+    width: 100%;
+    height: 100%;
+    font-size: 1.0em;
+    font-family: 'me_quran';
+    text-align: center;
+    display: block;
 }
 .ui-icon-keyboard { background-image: url(../images/keyboard.png) !important;
                     width: 32px !important; 

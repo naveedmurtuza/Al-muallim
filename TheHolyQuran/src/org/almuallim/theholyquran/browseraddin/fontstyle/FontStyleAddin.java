@@ -4,9 +4,19 @@
  */
 package org.almuallim.theholyquran.browseraddin.fontstyle;
 
+import com.google.common.io.Files;
+import com.osbcp.cssparser.CSSParser;
+import com.osbcp.cssparser.Rule;
+import com.osbcp.cssparser.Rules;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.prefs.BackingStoreException;
+import java.util.List;
 import java.util.prefs.Preferences;
 import javafx.application.Platform;
 import javafx.scene.web.WebView;
@@ -17,11 +27,12 @@ import org.almuallim.service.browser.BrowserAddIn;
 import org.almuallim.service.browser.JSEngine;
 import org.almuallim.service.browser.ActionDisplayPosition;
 import org.almuallim.service.browser.ActionDisplayStyle;
+import org.almuallim.service.helpers.Application;
 import org.almuallim.theholyquran.ModuleConstants;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.Exceptions;
-import org.openide.util.NbPreferences;
+import org.openide.util.Utilities;
 import org.openide.util.lookup.ServiceProvider;
 import org.w3c.dom.Document;
 
@@ -32,11 +43,13 @@ import org.w3c.dom.Document;
 @ServiceProvider(service = BrowserAddIn.class, position = 1000)
 public class FontStyleAddin implements BrowserAddIn {
 
+    private static final String CSS_FILE_PATH = Application.getHome() + File.separatorChar + ModuleConstants.MODULE_NAME + File.separator + "FontStyleAddin" + File.separator + "fontStyles.css";
     private final ImageIcon icon;
     private Document dom;
     private JSEngine engine;
     private WebView view;
     private Action action;
+    private List<Rule> rules = new ArrayList<>();
 
     public FontStyleAddin() {
         icon = new ImageIcon(getClass().getResource("colors.png"));
@@ -48,65 +61,31 @@ public class FontStyleAddin implements BrowserAddIn {
         this.engine = engine;
         this.view = view;
         new Thread(new Runnable() {
+
             @Override
             public void run() {
                 try {
-                    //path home/[modulename]/fontstyles.css
-                    final StringBuilder sb = new StringBuilder();
-                    Preferences defaultStyles = NbPreferences.forModule(getClass()).node("styles/default");
-                    for (String name : defaultStyles.childrenNames()) {
-                        sb.append(getCssSyle(defaultStyles, name));//.append(System.lineSeparator());
+                    //load the css file, if exists
+                    File cssFile = new File(CSS_FILE_PATH);
+                    cssFile.getParentFile().mkdirs();
+                    if (cssFile.exists()) {
+                        rules = CSSParser.parse(Files.toString(cssFile, Charset.defaultCharset()));
+                        final String script = MessageFormat.format("insertStylesheet(''{0}'');", Utilities.toURI(cssFile));
+                        
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                FontStyleAddin.this.engine.executeScript(script);
+                            }
+                        });
                     }
-                    Preferences translatorStyles = NbPreferences.forModule(getClass()).node("styles/translator");
-                    for (String name : translatorStyles.childrenNames()) {
-                        sb.append(getCssSyle(translatorStyles, name));//.append(System.lineSeparator());
-                    }
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            System.out.println(sb.toString());
-                            FontStyleAddin.this.engine.executeScript(String.format("insertCssClass(\"%s\");", sb.toString()));
-                        }
-                    });
-
-                } catch (BackingStoreException bse) {
-                    Exceptions.printStackTrace(bse);
+                } catch (IOException ioe) {
+                    Exceptions.printStackTrace(ioe);
+                } catch (Exception ex) {
+                    Exceptions.printStackTrace(ex);
                 }
             }
         }).start();
-    }
-
-    private String getCssSyle(Preferences pref, String name) {
-        Preferences node = pref.node(name);
-        //build the css class name
-        StringBuilder sb = new StringBuilder();
-        sb.append(".").append("style_").append(name).append(" {");
-        String prop;
-        prop = node.get("font-family", "");
-        if (!prop.isEmpty()) {
-            sb.append("font-family: '").append(prop).append("';");
-        }
-        prop = node.get("font-size", "");
-        if (!prop.isEmpty()) {
-            sb.append("font-size: ").append(prop).append("px ;");
-        }
-        prop = node.get("color", "");
-        if (!prop.isEmpty()) {
-            sb.append("color: ").append(prop).append(" ;");
-        }
-        prop = node.get("background", "");
-        if (!prop.isEmpty()) {
-            sb.append("background-color: ").append(prop).append(" ;");
-        }
-
-//        prop = node.get("font-style", "");
-//
-//        if (!prop.isEmpty()) {
-//            sb.append("font-style: ").append(prop).append(";");
-//        }
-        sb.append(" }");
-        //add this style to dom
-        return sb.toString();
     }
 
     @Override
@@ -126,8 +105,6 @@ public class FontStyleAddin implements BrowserAddIn {
     public EnumSet<ActionDisplayPosition> getDisplayPosition() {
         return EnumSet.of(ActionDisplayPosition.TOOLBAR);
     }
-
-    
 
     @Override
     public boolean separatorAfter() {
@@ -152,26 +129,25 @@ public class FontStyleAddin implements BrowserAddIn {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            final FontStylePanel panel = new FontStylePanel(rules);
+            DialogDescriptor dd = new DialogDescriptor(panel, "Select Translations",true,new ActionListener() {
 
-            // read style properties 
-            Platform.runLater(new Runnable() {
                 @Override
-                public void run() {
-                    Object o = engine.executeScript("$('html').clone().html();");
-
-//                           ((JSObject)o).eval(NAME);
-                    int f = 1;
-
+                public void actionPerformed(ActionEvent e) {
+                    if(e.getActionCommand().equalsIgnoreCase("OK"))
+                    {
+                      List<Rule> rules =  panel.getRules();
+                        try {
+                            Rules.save(rules,CSS_FILE_PATH);
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                    }
                 }
             });
 
-            FontStylePanel panel = new FontStylePanel();
-            panel.init();
-            DialogDescriptor dd = new DialogDescriptor(panel, "Select Translations");
-
             DialogDisplayer.getDefault().notify(dd);
-            panel.save();
-
+            //panel.save();
 
         }
     }

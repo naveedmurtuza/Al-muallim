@@ -82,7 +82,6 @@ public class ReloadAddin implements BrowserAddIn {
         public ReloadAction() {
             super("Reload", icon);
             putValue(Action.SHORT_DESCRIPTION, "Reload (Ctrl F5)");
-//            putValue(Action.NAME, "Reload");
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control F5"));
         }
 

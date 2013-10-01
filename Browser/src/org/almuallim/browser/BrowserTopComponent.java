@@ -29,6 +29,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javax.swing.Action;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import netscape.javascript.JSObject;
 import org.almuallim.service.browser.Browser;
@@ -133,7 +134,7 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
         }
         try {
             final File temp = File.createTempFile("almuallim_", ".html");
-            urlOpener.generateHtml(url, temp);
+            urlOpener.generateHtml(new AlmuallimURL(url), temp);
             LOG.info("loading engine ....");
             Platform.runLater(new Runnable() {
                 @Override
@@ -144,7 +145,7 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
             });
             setName(url.getParameters().containsKey("title") ? url.getParameters().get("title") : url.getModuleName());
             LOG.info(temp.getAbsoluteFile().getAbsolutePath());
-            //is it good? or shud be deleted when the window closes?
+            //TODO: is it good? or shud be deleted when the window closes?
             temp.deleteOnExit();
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
@@ -262,7 +263,10 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
         engine.setOnAlert(new EventHandler<WebEvent<String>>() {
             @Override
             public void handle(WebEvent<String> t) {
-                System.out.println(t.getData());
+                if(t != null)
+                {
+                    LOG.log(Level.INFO, "alert:{0}", t.getData());
+                }
             }
         });
         engine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
@@ -270,7 +274,7 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
             public void changed(ObservableValue<? extends Worker.State> ov, Worker.State t, Worker.State t1) {
                 if (t1 == Worker.State.SUCCEEDED) {
                     //ok the page is loaded...
-                    setScrollPosition(scroll);
+                    //setScrollPosition(scroll);
                     padeLoaded = true;
                     jsWindowObject = (JSObject) engine.executeScript("window");
                     installBrowserAddins();
@@ -309,7 +313,7 @@ public final class BrowserTopComponent extends TopComponent implements Preferenc
             if (!supported) {
                 continue;
             }
-            //let the addin does some initialization
+            //let the addin do some initialization
             browserAddIn.init(engine.getDocument(), getJSEngine(), view);
             //get the action
             Action a = browserAddIn.getAction();

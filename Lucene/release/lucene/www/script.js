@@ -51,12 +51,13 @@ $(document).ready(function() {
             $("#searchBtn").click();
         }
     });
-    //enable the tips
+    
     $('#searchResults').on('click', 'article', function() {
         var url = $(this).data('url');
         alert(url);
         open.openResult(url);
     });
+    //enable the tips
     $('.tips').qtip({
         content: {
             text: $('#searchTips'), button: true // Add .clone() if you don't want the matched elements to be removed, but simply copied

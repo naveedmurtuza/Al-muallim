@@ -455,7 +455,7 @@ public class TheHolyQuran implements ModuleConstants {
             }
         }
         TanzilParser parser = new TanzilTextParser();
-        List<String> verses = parser.parse(new InputStreamReader(TheHolyQuran.class.getClassLoader().getResourceAsStream("org/almuallim/theholyquran/data/quran-simple-enhanced.txt"), Charsets.UTF_8));
+        List<String> verses = parser.parse(new InputStreamReader(TheHolyQuran.class.getClassLoader().getResourceAsStream("org/almuallim/theholyquran/data/quran-noor-e-hidayat"), Charsets.UTF_8));
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO VERSE (INDEX,VERSE_TEXT) VALUES ");
         for (int i = 1; i <= verses.size(); i++) {

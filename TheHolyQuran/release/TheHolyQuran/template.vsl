@@ -20,7 +20,7 @@
                 #set($index = $foreach.count)
                 <article class="verse " data-url="$verse.url" data-chapter-index="$verse.chapterIndex" data-verse-index="$index" data-ref="$verse.refText">
                     <p class="verbatim">
-                        <img src="$verse.imagePath"/>
+                        <img src="$verse.imagePath" />
                     </p>
                 </article>
             #end

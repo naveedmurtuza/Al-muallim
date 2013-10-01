@@ -166,6 +166,7 @@ public class JFontChooser extends JComponent {
         this.add(contentsPanel);
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         this.setSelectedFont(DEFAULT_SELECTED_FONT);
+        
     }
 
     public JTextField getFontFamilyTextField() {
@@ -445,7 +446,7 @@ public class JFontChooser extends JComponent {
                     textComponent.selectAll();
                     textComponent.requestFocus();
                 }
-
+                firePropertyChange("FONT_FAMILY_CHANGED", oldValue, selectedValue);
                 updateSampleFont();
             }
         }
@@ -543,7 +544,9 @@ public class JFontChooser extends JComponent {
                         SwingUtilities.invokeLater(new ListSelector(index));
                     }
                 }
+                firePropertyChange("FONT_STYLE_CHANGE", null, "");
             }
+            //
         }
 
         public class ListSelector implements Runnable {

@@ -22,7 +22,11 @@
         <folder name="Window">
             <file name="Output_hidden"/>
             <file name="ProgressListAction.shadow_hidden"/>
+            <file name="Tools_hidden"/>
             <file name="Web_hidden"/>
+            <file name="org-netbeans-core-windows-actions-GlobalPropertiesAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/org-netbeans-core-windows-actions-GlobalPropertiesAction.instance"/>
+            </file>
         </folder>
     </folder>
     <folder name="Toolbars">

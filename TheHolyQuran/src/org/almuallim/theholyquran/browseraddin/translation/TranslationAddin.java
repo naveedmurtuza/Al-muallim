@@ -189,13 +189,13 @@ public class TranslationAddin implements BrowserAddIn {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    Object executeScript = engine.executeScript("getSelectItem();");
-                    Object member = ((JSObject)executeScript).getMember("ref");
-                }
-            });
+//            Platform.runLater(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Object executeScript = engine.executeScript("getSelectItem();");
+//                    Object member = ((JSObject)executeScript).getMember("ref");
+//                }
+//            });
             TranslatorsPanel panel = new TranslatorsPanel();
             panel.buildTree(translatorIds);
             DialogDescriptor dd = new DialogDescriptor(panel, "Select Translations");

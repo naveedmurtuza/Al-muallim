@@ -16,6 +16,12 @@ jQuery(document).ready(function($) {
     });
 });
 
+function insertStylesheet(cssfile)
+{
+    var sheet = "$(\"<link rel='stylesheet' href='{0}' type='text/css' />\")".format(cssfile);
+    alert(sheet);
+    $('head').append(sheet);
+}
 function insertCssClass(css)
 {
     var style = document.createElement('style');
