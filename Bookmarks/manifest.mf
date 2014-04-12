@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.almuallim.bookmarks
+OpenIDE-Module-Localizing-Bundle: org/almuallim/bookmarks/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+
